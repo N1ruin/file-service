@@ -1,7 +1,7 @@
 package by.niruin.techprocess_service.file_service.exception.handler;
 
 import by.niruin.techprocess_service.file_service.exception.*;
-import by.niruin.techprocess_service.file_service.model.ErrorResponse;
+import by.niruin.techprocess_service.file_service.model.error.ErrorResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;

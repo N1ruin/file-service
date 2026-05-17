@@ -1,6 +1,9 @@
 package by.niruin.techprocess_service.file_service.controller;
 
-import by.niruin.techprocess_service.file_service.model.*;
+import by.niruin.techprocess_service.file_service.model.file.UpdateFileRequest;
+import by.niruin.techprocess_service.file_service.model.file.UpdateFileResponse;
+import by.niruin.techprocess_service.file_service.model.file.UploadFileRequest;
+import by.niruin.techprocess_service.file_service.model.file.UploadFileResponse;
 import by.niruin.techprocess_service.file_service.service.FileImageService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
