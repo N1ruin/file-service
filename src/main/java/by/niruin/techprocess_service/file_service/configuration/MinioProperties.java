@@ -7,8 +7,10 @@ public class MinioProperties {
     private String endpoint;
     private String user;
     private String password;
-    private String bucketName;
+    private String permanentFileBucketName;
+    private String temporaryFilesBucketName;
     private Long maxFileSize;
+    private Integer temporaryFilesLifeDays;
 
     public String getEndpoint() {
         return endpoint;
@@ -22,31 +24,19 @@ public class MinioProperties {
         return password;
     }
 
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getBucketName() {
-        return bucketName;
-    }
-
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
+    public String getPermanentFileBucketName() {
+        return permanentFileBucketName;
     }
 
     public Long getMaxFileSize() {
         return maxFileSize;
     }
 
-    public void setMaxFileSize(Long maxFileSize) {
-        this.maxFileSize = maxFileSize;
+    public String getTemporaryFilesBucketName() {
+        return temporaryFilesBucketName;
+    }
+
+    public Integer getTemporaryFilesLifeDays() {
+        return temporaryFilesLifeDays;
     }
 }

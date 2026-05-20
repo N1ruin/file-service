@@ -44,7 +44,7 @@ public class FileImageServiceIT extends BaseIntegrationTest {
     void clearMinIO() throws MinioException {
         var results = minioClient.listObjects(
                 ListObjectsArgs.builder()
-                        .bucket(properties.getBucketName())
+                        .bucket(properties.getPermanentFileBucketName())
                         .build()
         );
 
@@ -52,7 +52,7 @@ public class FileImageServiceIT extends BaseIntegrationTest {
             var item = result.get();
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
-                            .bucket(properties.getBucketName())
+                            .bucket(properties.getPermanentFileBucketName())
                             .object(item.objectName())
                             .build()
             );
@@ -148,60 +148,6 @@ public class FileImageServiceIT extends BaseIntegrationTest {
                         jsonPath("$.error").exists(),
                         jsonPath("$.message").exists(),
                         jsonPath("$.code").value(400));
-    }
-
-    @Test
-    void update_shouldThrowFileNotFound() throws Exception {
-        var fileName = UUID.randomUUID() + ".png";
-        var fileContent = "test-content".getBytes(StandardCharsets.UTF_8);
-        var file = new MockMultipartFile("file", "testimagename.png",
-                MediaType.IMAGE_JPEG.toString(), fileContent);
-
-        mockMvc.perform(multipart(HttpMethod.PUT, BASE_REQUEST_PATH + "/{file-name}", fileName)
-                        .file(file))
-                .andExpectAll(
-                        status().isNotFound(),
-                        jsonPath("$.error").exists(),
-                        jsonPath("$.message").exists(),
-                        jsonPath("$.code").value(404));
-    }
-
-    @Test
-    void update_shouldThrowParameterValidationEx() throws Exception {
-        var fileName = UUID.randomUUID() + ".docx";
-        var fileContent = "test-content".getBytes(StandardCharsets.UTF_8);
-        var file = new MockMultipartFile("file", "testimagename.docx",
-                MediaType.IMAGE_JPEG.toString(), fileContent);
-
-        mockMvc.perform(multipart(HttpMethod.PUT, BASE_REQUEST_PATH + "/{file-name}", fileName)
-                        .file(file))
-                .andExpectAll(
-                        status().isBadRequest(),
-                        jsonPath("$.error").exists(),
-                        jsonPath("$.message").exists(),
-                        jsonPath("$.code").value(400));
-    }
-
-    @Test
-    void update_shouldReturnFileName() throws Exception {
-        var fileContent = "test-content".getBytes(StandardCharsets.UTF_8);
-        var oldFile = new MockMultipartFile("file", "testimagename.png",
-                MediaType.IMAGE_JPEG.toString(), fileContent);
-        var newFile = new MockMultipartFile("file", "newtestimagename.jpeg",
-                MediaType.IMAGE_JPEG.toString(), fileContent);
-
-        var savedFileName = fileImageService.upload(oldFile);
-
-        mockMvc.perform(multipart(HttpMethod.PUT, BASE_REQUEST_PATH + "/{file-name}", savedFileName)
-                        .file(newFile))
-                .andExpectAll(
-                        status().isOk(),
-                        jsonPath("$.fileName").value(savedFileName))
-                .andReturn();
-
-        var fileBytes = fileImageService.download(savedFileName);
-
-        assertThat(fileBytes).isEqualTo(newFile.getBytes());
     }
 
     @Test

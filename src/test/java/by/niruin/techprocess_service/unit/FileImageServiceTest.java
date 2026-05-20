@@ -56,7 +56,7 @@ public class FileImageServiceTest {
         when(file.getOriginalFilename()).thenReturn("image.jpg");
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(fileContent));
         when(file.getContentType()).thenReturn("image/jpeg");
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
+        when(minioProperties.getPermanentFileBucketName()).thenReturn("test-bucket");
         var mockResponse = mock(ObjectWriteResponse.class);
         when(minioClient.putObject(any(PutObjectArgs.class))).thenReturn(mockResponse);
 
@@ -86,7 +86,7 @@ public class FileImageServiceTest {
         when(file.getOriginalFilename()).thenReturn("test.jpg");
         when(file.getContentType()).thenReturn("image/jpeg");
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(fileContent));
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
+        when(minioProperties.getPermanentFileBucketName()).thenReturn("test-bucket");
         var mockResponse = mock(ObjectWriteResponse.class);
         when(minioClient.putObject(any(PutObjectArgs.class))).thenReturn(mockResponse);
 
@@ -102,7 +102,7 @@ public class FileImageServiceTest {
     void download_shouldReturnBytes_whereFileExist() throws MinioException, IOException {
         var fileName = UUID.randomUUID() + ".jpeg";
         byte[] expectedContent = "test image content".getBytes();
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
+        when(minioProperties.getPermanentFileBucketName()).thenReturn("test-bucket");
         var mockResponse = mock(GetObjectResponse.class);
         when(minioClient.getObject(any(GetObjectArgs.class))).thenReturn(mockResponse);
         when(mockResponse.readAllBytes()).thenReturn(expectedContent);
@@ -115,7 +115,7 @@ public class FileImageServiceTest {
     @Test
     void download_shouldThrowFileNotFound() throws MinioException {
         var fileName = UUID.randomUUID() + ".jpeg";
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
+        when(minioProperties.getPermanentFileBucketName()).thenReturn("test-bucket");
         var mockErrorResponseException = mock(ErrorResponseException.class);
         var mockErrorResponse = mock(ErrorResponse.class);
         when(mockErrorResponseException.errorResponse()).thenReturn(mockErrorResponse);
@@ -130,62 +130,9 @@ public class FileImageServiceTest {
     }
 
     @Test
-    void update_shouldThrowFileNotFound() throws MinioException {
-        var fileName = UUID.randomUUID() + ".jpeg";
-        var file = mock(MultipartFile.class);
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
-        var mockErrorResponseException = mock(ErrorResponseException.class);
-        var mockErrorResponse = mock(ErrorResponse.class);
-        when(mockErrorResponseException.errorResponse()).thenReturn(mockErrorResponse);
-        when(mockErrorResponse.code()).thenReturn("NoSuchKey");
-        when(minioClient.statObject(any(StatObjectArgs.class))).thenThrow(mockErrorResponseException);
-
-        assertThatThrownBy(() -> fileImageService.update(fileName, file))
-                .isInstanceOf(FileNotFoundException.class);
-
-        verify(minioClient).statObject(any(StatObjectArgs.class));
-        verify(minioClient, never()).putObject(any(PutObjectArgs.class));
-    }
-
-    @Test
-    void update_shouldThrowFileTooLarge_whereFileSizeMore2MB() throws MinioException {
-        var fileName = UUID.randomUUID() + ".jpeg";
-        var file = mock(MultipartFile.class);
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
-        when(file.getSize()).thenReturn(3 * 1024 * 1024L);
-        var mockStatObjectResponse = mock(StatObjectResponse.class);
-        when(minioClient.statObject(any(StatObjectArgs.class))).thenReturn(mockStatObjectResponse);
-
-        assertThatThrownBy(() -> fileImageService.update(fileName, file))
-                .isInstanceOf(FileTooLargeException.class);
-
-        verify(minioClient, never()).putObject(any(PutObjectArgs.class));
-    }
-
-    @Test
-    void updateSuccess_shouldReturnFileName_whereFileExist() throws MinioException, IOException {
-        var fileName = UUID.randomUUID() + ".jpeg";
-        var file = mock(MultipartFile.class);
-        byte[] fileContent = "test content".getBytes();
-        when(file.getOriginalFilename()).thenReturn(fileName);
-        when(file.getSize()).thenReturn(2 * 1024 * 1024L);
-        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(fileContent));
-        when(file.getContentType()).thenReturn("image/jpeg");
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
-        var statObjectResponse = mock(StatObjectResponse.class);
-        when(minioClient.statObject(any(StatObjectArgs.class))).thenReturn(statObjectResponse);
-        var mockResponse = mock(ObjectWriteResponse.class);
-        when(minioClient.putObject(any(PutObjectArgs.class))).thenReturn(mockResponse);
-
-        var result = fileImageService.update(fileName, file);
-
-        assertThat(result).isEqualTo(fileName);
-    }
-
-    @Test
     void delete_shouldThrowFileNotFound() throws MinioException {
         var fileName = UUID.randomUUID() + ".jpeg";
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
+        when(minioProperties.getPermanentFileBucketName()).thenReturn("test-bucket");
         var mockErrorResponseException = mock(ErrorResponseException.class);
         var mockErrorResponse = mock(ErrorResponse.class);
         when(mockErrorResponseException.errorResponse()).thenReturn(mockErrorResponse);
@@ -202,7 +149,7 @@ public class FileImageServiceTest {
     @Test
     void deleteSuccess_whereFileExist() throws MinioException {
         var fileName = UUID.randomUUID() + ".jpeg";
-        when(minioProperties.getBucketName()).thenReturn("test-bucket");
+        when(minioProperties.getPermanentFileBucketName()).thenReturn("test-bucket");
         var statObjectResponse = mock(StatObjectResponse.class);
         when(minioClient.statObject(any(StatObjectArgs.class))).thenReturn(statObjectResponse);
 

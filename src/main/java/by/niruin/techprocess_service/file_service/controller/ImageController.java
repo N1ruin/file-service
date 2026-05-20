@@ -1,7 +1,5 @@
 package by.niruin.techprocess_service.file_service.controller;
 
-import by.niruin.techprocess_service.file_service.model.file.UpdateFileRequest;
-import by.niruin.techprocess_service.file_service.model.file.UpdateFileResponse;
 import by.niruin.techprocess_service.file_service.model.file.UploadFileRequest;
 import by.niruin.techprocess_service.file_service.model.file.UploadFileResponse;
 import by.niruin.techprocess_service.file_service.service.FileImageService;
@@ -42,17 +40,6 @@ public class ImageController {
         var fileBytes = fileImageService.download(fileName);
 
         return ResponseEntity.ok(fileBytes);
-    }
-
-    @PutMapping(value = "/{file-name}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UpdateFileResponse> update(@PathVariable("file-name") @NotNull @Pattern(regexp = FILE_NAME_REGEX)
-                                                     String fileName,
-                                                     @Valid @ModelAttribute UpdateFileRequest request) {
-        var updatedFileName = fileImageService.update(fileName, request.file());
-
-        var response = new UpdateFileResponse(updatedFileName);
-
-        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{file-name}")

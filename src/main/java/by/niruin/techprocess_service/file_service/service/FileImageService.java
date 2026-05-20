@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-
 @Service
 public class FileImageService {
     private static final List<String> ALLOWED_EXTENSIONS = List.of(".jpg", ".jpeg", ".png");
@@ -37,7 +36,7 @@ public class FileImageService {
         try {
             minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket(properties.getBucketName())
+                            .bucket(properties.getTemporaryFilesBucketName())
                             .object(newFileName)
                             .stream(file.getInputStream(), file.getSize(), -1L)
                             .contentType(file.getContentType())
@@ -51,12 +50,12 @@ public class FileImageService {
     }
 
     public byte[] download(String fileName) {
-        checkFileExistence(fileName);
+        checkFileExistence(fileName, properties.getPermanentFileBucketName());
 
         try {
             var response = minioClient.getObject(
                     GetObjectArgs.builder()
-                            .bucket(properties.getBucketName())
+                            .bucket(properties.getPermanentFileBucketName())
                             .object(fileName)
                             .build()
             );
@@ -67,38 +66,33 @@ public class FileImageService {
         }
     }
 
-    public String update(String fileName, MultipartFile file) {
-        checkFileExistence(fileName);
-        checkFileSize(file);
-
-        var extension = extractFileExtension(file.getOriginalFilename());
-        if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new InvalidFileFormatException("Invalid image format: " + file.getOriginalFilename());
-        }
+    public void transferToPermanentBucket(String fileName) {
+        checkFileExistence(fileName, properties.getTemporaryFilesBucketName());
+        checkFileExistence(fileName, properties.getPermanentFileBucketName());
 
         try {
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket(properties.getBucketName())
+            minioClient.copyObject(
+                    CopyObjectArgs.builder()
+                            .bucket(properties.getPermanentFileBucketName())
                             .object(fileName)
-                            .stream(file.getInputStream(), file.getSize(), -1L)
-                            .contentType(file.getContentType())
-                            .build()
-            );
+                            .source(
+                                    SourceObject.builder()
+                                            .bucket(properties.getTemporaryFilesBucketName())
+                                            .object(fileName)
+                                            .build()).
+                            build());
         } catch (Exception e) {
-            throw new FileUpdateException("Update file %s error".formatted(fileName), e);
+            throw new TransferFileException("File %s copy error".formatted(fileName), e);
         }
-
-        return fileName;
     }
 
     public void delete(String fileName) {
-        checkFileExistence(fileName);
+        checkFileExistence(fileName, properties.getPermanentFileBucketName());
 
         try {
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
-                            .bucket(properties.getBucketName())
+                            .bucket(properties.getPermanentFileBucketName())
                             .object(fileName)
                             .build()
             );
@@ -122,17 +116,17 @@ public class FileImageService {
         }
     }
 
-    private void checkFileExistence(String fileName) {
-        if (!isFileExist(fileName)) {
+    private void checkFileExistence(String fileName, String bucketName) {
+        if (!isFileExist(fileName, bucketName)) {
             throw new FileNotFoundException("File with name %s not found".formatted(fileName));
         }
     }
 
-    private boolean isFileExist(String fileName) {
+    private boolean isFileExist(String fileName, String bucketName) {
         try {
             minioClient.statObject(
                     StatObjectArgs.builder()
-                            .bucket(properties.getBucketName())
+                            .bucket(bucketName)
                             .object(fileName)
                             .build());
 
