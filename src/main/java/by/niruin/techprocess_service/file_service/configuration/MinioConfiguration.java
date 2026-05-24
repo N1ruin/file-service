@@ -28,7 +28,7 @@ public class MinioConfiguration {
                 .build();
 
         try {
-            createConstantFilesBucket(minioClient, properties);
+            createPermanentFilesBucket(minioClient, properties);
             createTempFilesBucket(minioClient, properties);
 
             addAutocleaningRuleToTempBucket(minioClient, properties);
@@ -51,7 +51,7 @@ public class MinioConfiguration {
         );
     }
 
-    private void createConstantFilesBucket(MinioClient client, MinioProperties properties) throws MinioException {
+    private void createPermanentFilesBucket(MinioClient client, MinioProperties properties) throws MinioException {
         if (isBucketNotExist(client, properties.getPermanentFileBucketName())) {
             client.makeBucket(
                     MakeBucketArgs

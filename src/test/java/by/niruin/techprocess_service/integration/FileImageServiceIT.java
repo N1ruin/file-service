@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles("test")
 public class FileImageServiceIT extends BaseIntegrationTest {
     private static final String BASE_REQUEST_PATH = "/api/v1/file-service/files/images";
     @Autowired
@@ -116,6 +115,7 @@ public class FileImageServiceIT extends BaseIntegrationTest {
                 MediaType.IMAGE_JPEG.toString(), fileContent);
 
         var savedFileName = fileImageService.upload(file);
+        fileImageService.transferToPermanentBucket(savedFileName);
 
         var result = mockMvc.perform(get(BASE_REQUEST_PATH + "/{file-name}", savedFileName))
                 .andExpectAll(
@@ -157,6 +157,7 @@ public class FileImageServiceIT extends BaseIntegrationTest {
                 MediaType.IMAGE_JPEG.toString(), fileContent);
 
         var savedFileName = fileImageService.upload(file);
+        fileImageService.transferToPermanentBucket(savedFileName);
 
         mockMvc.perform(delete(BASE_REQUEST_PATH + "/{file-name}", savedFileName))
                 .andExpectAll(

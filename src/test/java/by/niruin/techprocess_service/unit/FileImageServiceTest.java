@@ -56,7 +56,7 @@ public class FileImageServiceTest {
         when(file.getOriginalFilename()).thenReturn("image.jpg");
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(fileContent));
         when(file.getContentType()).thenReturn("image/jpeg");
-        when(minioProperties.getPermanentFileBucketName()).thenReturn("test-bucket");
+        when(minioProperties.getTemporaryFilesBucketName()).thenReturn("test-bucket");
         var mockResponse = mock(ObjectWriteResponse.class);
         when(minioClient.putObject(any(PutObjectArgs.class))).thenReturn(mockResponse);
 
@@ -86,7 +86,7 @@ public class FileImageServiceTest {
         when(file.getOriginalFilename()).thenReturn("test.jpg");
         when(file.getContentType()).thenReturn("image/jpeg");
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(fileContent));
-        when(minioProperties.getPermanentFileBucketName()).thenReturn("test-bucket");
+        when(minioProperties.getTemporaryFilesBucketName()).thenReturn("test-bucket");
         var mockResponse = mock(ObjectWriteResponse.class);
         when(minioClient.putObject(any(PutObjectArgs.class))).thenReturn(mockResponse);
 

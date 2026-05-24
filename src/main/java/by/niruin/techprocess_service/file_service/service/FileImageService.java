@@ -68,9 +68,10 @@ public class FileImageService {
 
     public void transferToPermanentBucket(String fileName) {
         checkFileExistence(fileName, properties.getTemporaryFilesBucketName());
-        checkFileExistence(fileName, properties.getPermanentFileBucketName());
+        checkFileNotExist(fileName, properties.getPermanentFileBucketName());
 
         try {
+
             minioClient.copyObject(
                     CopyObjectArgs.builder()
                             .bucket(properties.getPermanentFileBucketName())
@@ -81,6 +82,8 @@ public class FileImageService {
                                             .object(fileName)
                                             .build()).
                             build());
+
+            deleteFromTemporaryBucket(fileName);
         } catch (Exception e) {
             throw new TransferFileException("File %s copy error".formatted(fileName), e);
         }
@@ -93,6 +96,21 @@ public class FileImageService {
             minioClient.removeObject(
                     RemoveObjectArgs.builder()
                             .bucket(properties.getPermanentFileBucketName())
+                            .object(fileName)
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new FileDeleteException("Failed to delete file %s from MinIO".formatted(fileName));
+        }
+    }
+
+    public void deleteFromTemporaryBucket(String fileName) {
+        checkFileExistence(fileName, properties.getTemporaryFilesBucketName());
+
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(properties.getTemporaryFilesBucketName())
                             .object(fileName)
                             .build()
             );
@@ -122,7 +140,13 @@ public class FileImageService {
         }
     }
 
-    private boolean isFileExist(String fileName, String bucketName) {
+    private void checkFileNotExist(String fileName, String bucketName) {
+        if (isFileExist(fileName, bucketName)) {
+            throw new FileAlreadyExistException("File with name %s already exists in permanent storage".formatted(fileName));
+        }
+    }
+
+    public boolean isFileExist(String fileName, String bucketName) {
         try {
             minioClient.statObject(
                     StatObjectArgs.builder()

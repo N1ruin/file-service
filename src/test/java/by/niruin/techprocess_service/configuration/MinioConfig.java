@@ -12,7 +12,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration
 @Profile("test")
-public class TestConfig {
+public class MinioConfig {
     @Bean
     public MinIOContainer minIOContainer() {
         return new MinIOContainer(DockerImageName.parse("minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1"));
@@ -27,13 +27,5 @@ public class TestConfig {
             registry.add("minio.bucketName", () -> "equipments");
             registry.add("minio.maxFileSize", () -> 2097152);
         };
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http){
-        http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
-
-        return http.build();
     }
 }
