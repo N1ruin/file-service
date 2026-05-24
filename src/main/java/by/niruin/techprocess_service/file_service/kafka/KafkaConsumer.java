@@ -27,9 +27,14 @@ public class KafkaConsumer {
 
         logger.info("Transferring file '{}' from temp to permanent bucket", event.fileName());
 
-        fileImageService.transferToPermanentBucket(event.fileName());
+        try {
+            fileImageService.transferToPermanentBucket(event.fileName());
 
-        logger.info("File '{}' successfully transferred", event.fileName());
+            logger.info("File '{}' successfully transferred", event.fileName());
+        } catch (Exception e) {
+            logger.error("Move file to permanent storage event processing", e);
+        }
+
     }
 
     @KafkaHandler
@@ -40,9 +45,13 @@ public class KafkaConsumer {
 
         logger.info("Deleting file '{}' from permanent bucket", event.fileName());
 
-        fileImageService.delete(event.fileName());
+        try {
+            fileImageService.delete(event.fileName());
 
-        logger.info("File '{}' successfully deleted", event.fileName());
+            logger.info("File '{}' successfully deleted", event.fileName());
+        } catch (Exception e) {
+            logger.error("Move file to permanent storage event processing", e);
+        }
     }
 
     private boolean isFileNameIsNullOrBlank(String fileName) {

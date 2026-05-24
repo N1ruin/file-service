@@ -40,8 +40,7 @@ public class FileImageService {
                             .object(newFileName)
                             .stream(file.getInputStream(), file.getSize(), -1L)
                             .contentType(file.getContentType())
-                            .build()
-            );
+                            .build());
         } catch (Exception e) {
             throw new FileUploadException("File %s upload error".formatted(originalFileName), e);
         }
