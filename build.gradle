@@ -18,22 +18,23 @@ repositories {
 }
 
 dependencies {
-	implementation("io.minio:minio:9.0.0")
+	implementation 'org.springframework.boot:spring-boot-starter-json'
+	implementation 'org.springframework.boot:spring-boot-starter-kafka'
+	implementation 'tools.jackson.module:jackson-module-kotlin'
+	implementation 'io.minio:minio:9.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.mapstruct:mapstruct:1.6.3'
-	implementation 'org.springframework.boot:spring-boot-starter-kafka'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-	testImplementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
 	testImplementation 'org.testcontainers:testcontainers-kafka'
-	testImplementation("org.testcontainers:testcontainers-minio:2.0.3")
-	testImplementation("org.awaitility:awaitility:4.2.0")
-	testImplementation("org.assertj:assertj-core:3.27.7")
+	testImplementation 'org.testcontainers:testcontainers-minio:2.0.3'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
+	testImplementation 'org.awaitility:awaitility:4.2.0'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

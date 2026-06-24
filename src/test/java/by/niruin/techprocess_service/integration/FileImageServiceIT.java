@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.MinIOContainer;
 
@@ -22,6 +21,7 @@ import java.util.UUID;
 
 import static by.niruin.techprocess_service.file_service.constant.Regex.FILE_NAME_REGEX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,7 +65,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
                 MediaType.IMAGE_JPEG.toString(), fileContent);
 
         var result = mockMvc.perform(multipart(HttpMethod.POST, BASE_REQUEST_PATH)
-                        .file(file))
+                        .file(file)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isCreated(),
                         jsonPath("$.fileName").exists(),
@@ -85,7 +86,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
                 MediaType.IMAGE_JPEG.toString(), largeData);
 
         mockMvc.perform(multipart(HttpMethod.POST, BASE_REQUEST_PATH)
-                        .file(file))
+                        .file(file)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isContentTooLarge(),
                         jsonPath("$.error").exists(),
@@ -100,7 +102,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
                 MediaType.IMAGE_JPEG.toString(), fileContent);
 
         mockMvc.perform(multipart(HttpMethod.POST, BASE_REQUEST_PATH)
-                        .file(file))
+                        .file(file)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isBadRequest(),
                         jsonPath("$.error").exists(),
@@ -117,7 +120,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
         var savedFileName = fileImageService.upload(file);
         fileImageService.transferToPermanentBucket(savedFileName);
 
-        var result = mockMvc.perform(get(BASE_REQUEST_PATH + "/{file-name}", savedFileName))
+        var result = mockMvc.perform(get(BASE_REQUEST_PATH + "/{file-name}", savedFileName)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isOk())
                 .andReturn();
@@ -130,7 +134,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
     void download_shouldThrowFileNotFound() throws Exception {
         var fileName = UUID.randomUUID() + ".png";
 
-        mockMvc.perform(get(BASE_REQUEST_PATH + "/{file-name}", fileName))
+        mockMvc.perform(get(BASE_REQUEST_PATH + "/{file-name}", fileName)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("$.error").exists(),
@@ -142,7 +147,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
     void download_shouldThrowInvalidFileFormat() throws Exception {
         var fileName = UUID.randomUUID() + ".docx";
 
-        mockMvc.perform(get(BASE_REQUEST_PATH + "/{file-name}", fileName))
+        mockMvc.perform(get(BASE_REQUEST_PATH + "/{file-name}", fileName)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isBadRequest(),
                         jsonPath("$.error").exists(),
@@ -159,7 +165,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
         var savedFileName = fileImageService.upload(file);
         fileImageService.transferToPermanentBucket(savedFileName);
 
-        mockMvc.perform(delete(BASE_REQUEST_PATH + "/{file-name}", savedFileName))
+        mockMvc.perform(delete(BASE_REQUEST_PATH + "/{file-name}", savedFileName)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isNoContent());
     }
@@ -168,7 +175,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
     void delete_shouldThrowFileNotFound() throws Exception {
         var fileName = UUID.randomUUID() + ".png";
 
-        mockMvc.perform(delete(BASE_REQUEST_PATH + "/{file-name}", fileName))
+        mockMvc.perform(delete(BASE_REQUEST_PATH + "/{file-name}", fileName)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isNotFound(),
                         jsonPath("$.error").exists(),
@@ -180,7 +188,8 @@ public class FileImageServiceIT extends BaseIntegrationTest {
     void delete_shouldThrowParameterValidationEx_whereInvalidFileFormat() throws Exception {
         var fileName = UUID.randomUUID() + ".xls";
 
-        mockMvc.perform(delete(BASE_REQUEST_PATH + "/{file-name}", fileName))
+        mockMvc.perform(delete(BASE_REQUEST_PATH + "/{file-name}", fileName)
+                        .with(jwt()))
                 .andExpectAll(
                         status().isBadRequest(),
                         jsonPath("$.error").exists(),

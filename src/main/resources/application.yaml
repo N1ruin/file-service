@@ -7,20 +7,51 @@ spring:
       max-file-size: 2MB
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      group-id: file-service-group
+      topic-name: file-topic
       properties:
         spring.json.trusted.packages: "*"
     group-id: file-service-group
     topic-name: file-topic
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/techprocess-service-realm
+
 minio:
-  endpoint: http://localhost:9000/
+  endpoint: http://minio:9000
   user: admin
   password: adminpass
   permanent-file-bucket-name: equipments
   temporary-files-bucket-name: temp
   maxFileSize: 2097152
   temporary-files-life-days: 1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: file-service

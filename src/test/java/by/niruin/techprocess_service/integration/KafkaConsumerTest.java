@@ -1,6 +1,5 @@
 package by.niruin.techprocess_service.integration;
 
-import by.niruin.techprocess_service.configuration.KafkaConfig;
 import by.niruin.techprocess_service.file_service.configuration.MinioProperties;
 import by.niruin.techprocess_service.file_service.model.event.EventType;
 import by.niruin.techprocess_service.file_service.model.event.FileDeletedEvent;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.testcontainers.kafka.KafkaContainer;
@@ -26,7 +24,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@Import({KafkaConfig.class})
 public class KafkaConsumerTest extends BaseIntegrationTest {
     @Value("${spring.kafka.topic-name}")
     private String topicName;
