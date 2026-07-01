@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidFileName(InvalidFileNameException exception) {
         log.warn("Exception: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("Validation error", exception.getMessage(),
-                HttpStatus.BAD_REQUEST.value());
+        var errorResponse = new ErrorResponse("Invalid File Name", "The file name contains unsupported " +
+                "characters or format", HttpStatus.BAD_REQUEST.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDeleteFileException(FileDeleteException exception) {
         log.error("File deletion error: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("File deletion error", exception.getMessage(),
+        var errorResponse = new ErrorResponse("Deletion Failed", "Unable to delete the file. Please try again",
                 HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -38,8 +38,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidImageFormat(InvalidFileFormatException exception) {
         log.warn("Invalid image format: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("Invalid image format", exception.getMessage(),
-                HttpStatus.BAD_REQUEST.value());
+        var errorResponse = new ErrorResponse("Unsupported File Format", "The file format is not supported." +
+                " Please use a valid format", HttpStatus.BAD_REQUEST.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
@@ -48,8 +48,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFileUpload(FileUploadException exception) {
         log.warn("File upload error: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("File upload error", exception.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value());
+        var errorResponse = new ErrorResponse("Upload Failed", "Unable to upload the file. " +
+                "Please check your request and try again", HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFileDownload(FileDownloadException exception) {
         log.warn("File download error: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("File download error", exception.getMessage(),
+        var errorResponse = new ErrorResponse("Download Failed", "Unable to download the file. Please try again",
                 HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFileNotFound(FileNotFoundException exception) {
         log.warn("File not found error: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("File not found", exception.getMessage(),
+        var errorResponse = new ErrorResponse("File Not Found", "The requested file does not exist or has been removed",
                 HttpStatus.NOT_FOUND.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFileTooLarge(FileTooLargeException exception) {
         log.warn("File too large error: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("File too large error", exception.getMessage(),
+        var errorResponse = new ErrorResponse("File Too Large", "The file exceeds the maximum allowed size",
                 HttpStatus.CONTENT_TOO_LARGE.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.CONTENT_TOO_LARGE);
@@ -88,18 +88,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleFileUpdate(FileUpdateException exception) {
         log.warn("File update error: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("File update error", exception.getMessage(),
+        var errorResponse = new ErrorResponse("Update Failed", "Unable to update the file. Please try again",
                 HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ErrorResponse> handleMethodValidation(HandlerMethodValidationException exception){
+    public ResponseEntity<ErrorResponse> handleMethodValidation(HandlerMethodValidationException exception) {
         log.warn("Parameter validation error: {}", exception.getMessage(), exception);
 
-        var errorResponse = new ErrorResponse("Parameter validation error", exception.getMessage(),
-                HttpStatus.BAD_REQUEST.value());
+        var errorResponse = new ErrorResponse("Validation Error", "Invalid request parameters." +
+                " Please check your input", HttpStatus.BAD_REQUEST.value());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
