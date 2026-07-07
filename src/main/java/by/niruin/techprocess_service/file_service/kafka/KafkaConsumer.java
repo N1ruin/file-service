@@ -10,7 +10,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@KafkaListener(topics = "${spring.kafka.topic-name}", groupId = "${spring.kafka.group-id}")
+@KafkaListener(topics = "${spring.kafka.topic-name}", groupId = "${spring.kafka.consumer.group-id}")
 public class KafkaConsumer {
     private static final Logger logger = LogManager.getLogger(KafkaConsumer.class);
     private final FileImageService fileImageService;
