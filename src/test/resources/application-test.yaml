@@ -1,5 +1,46 @@
 spring:
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+
+  servlet:
+    multipart:
+      max-file-size: 2MB
+
   kafka:
+    bootstrap-servers: localhost:9092
+    topic-name: file-service-topic
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      group-id: test-group
+      properties:
+        spring.json.trusted.packages: "*"
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/test-realm
+
+minio:
+  endpoint: http://localhost:9000
+  user: minioadmin
+  password: minioadmin
+  permanent-file-bucket-name: equipments
+  temporary-files-bucket-name: temp
+  maxFileSize: 2097152
+  temporary-files-life-days: 1
+
+eureka:
+  client:
+    enabled: false
+
+file-service:
+  url: http://localhost:9999
+  path: /api/v1/file-service/files/images
